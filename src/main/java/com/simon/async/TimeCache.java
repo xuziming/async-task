@@ -118,4 +118,8 @@ public class TimeCache<K, V> {
 		}
 	}
 
+	public void shutdown() {
+		CLEANER.shutdown();
+	}
+
 }

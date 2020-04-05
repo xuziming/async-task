@@ -1,7 +1,6 @@
 package com.simon.async;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +14,8 @@ public class AsyncTaskHandler<T> {
 
 	// 线程池里有很多线程需要同时执行，旧的可用线程将被新的任务触发重新执行，
 	// 如果线程超过60秒内没执行，那么将被终止并从池中删除
-	private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
+	// private static final ExecutorService EXECUTOR = Executors.newCachedThreadPool();
+	private static final ExecutorService EXECUTOR = OptimizedThreadPool.newOptimizedThreadPool(10000);
 
     private static final Object PRESENT = new Object();
 
@@ -33,6 +33,11 @@ public class AsyncTaskHandler<T> {
 		Future<T> future = new DelegateFuture<T>(EXECUTOR.submit(task));
 		timeCache.put(future, PRESENT, timeout, timeUnit);
 		return future;
+	}
+
+	public void shutdown() {
+		EXECUTOR.shutdown();
+		timeCache.shutdown();
 	}
 
 }
